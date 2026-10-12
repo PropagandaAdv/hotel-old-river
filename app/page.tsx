@@ -24,15 +24,14 @@ import {
   Lock,
   MapPin,
   Menu,
-  Moon,
   PawPrint,
   Phone,
   Presentation,
   ShowerHead,
   Snowflake,
-  Sun,
   Tv,
   UtensilsCrossed,
+  Users,
   Warehouse,
   Wifi,
   X,
@@ -61,7 +60,7 @@ const FORM_ENDPOINT = process.env.NEXT_PUBLIC_FORM_ENDPOINT ?? "";
 
 const NAV = [
   { href: "#camere", label: "Camere" },
-  { href: "#ristorante", label: "Ristorante" },
+  { href: "#tipologie", label: "Tipologie" },
   { href: "#aziende", label: "Aziende" },
   { href: "#dove", label: "Dove siamo" },
   { href: "#contatti", label: "Contatti" },
@@ -1060,80 +1059,109 @@ function Rooms({ onRequest }: { onRequest: (room: string) => void }) {
   );
 }
 
-function Restaurant() {
-  const [when, setWhen] = useState<"giorno" | "sera">("giorno");
+const TYPES = [
+  {
+    key: "doppia",
+    name: "Doppia",
+    guests: 2,
+    img: "/img/doppia.jpg",
+    title: "Per due.",
+    text: "La camera per una coppia o per due colleghi in trasferta: spazio per muoversi, un bagno tutto per voi.",
+  },
+  {
+    key: "tripla",
+    name: "Tripla",
+    guests: 3,
+    img: "/img/tripla.jpg",
+    title: "Per tre.",
+    text: "Per chi viaggia in tre, in famiglia o in squadra, senza dover prendere due camere.",
+  },
+  {
+    key: "quadrupla",
+    name: "Quadrupla",
+    guests: 4,
+    img: "/img/quadrupla.jpg",
+    title: "Per quattro.",
+    text: "Una camera sola per tutto il gruppo: si arriva, si lascia tutto e si resta insieme.",
+  },
+] as const;
+
+function RoomTypes({ onRequest }: { onRequest: (name: string, guests: number) => void }) {
+  const [sel, setSel] = useState(0);
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
   const reduce = useReduced();
-
-  const copy = {
-    giorno: {
-      title: "A tavola, senza fretta.",
-      text: "La sala si apre sul giardino con grandi vetrate. Luce naturale, tavoli larghi, il tempo di parlare davvero.",
-    },
-    sera: {
-      title: "La stessa sala, a luci basse.",
-      text: "Quando fuori scende la sera il tono cambia: tavoli apparecchiati, voci più piano, una cena che non ha orologio.",
-    },
-  } as const;
+  const t = TYPES[sel];
 
   return (
-    <section id="ristorante" ref={ref} className="relative overflow-hidden bg-ink py-24 md:py-0">
+    <section id="tipologie" ref={ref} className="relative overflow-hidden bg-ink py-24 md:py-0">
       <div className="mx-auto grid max-w-[1400px] items-center md:min-h-[88vh] md:grid-cols-2">
         <div className="px-6 md:px-10 md:py-24">
           <Stars />
-          <Label>Ristorante</Label>
+          <Label>Tipologie di camera</Label>
           <Rule />
           <AnimatePresence mode="wait">
             <motion.div
-              key={when}
+              key={t.key}
               initial={{ opacity: 0, y: reduce ? 0 : 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: reduce ? 0 : -12 }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             >
               <h2 className="max-w-[14ch] text-4xl font-light leading-[1.05] tracking-tight sm:text-6xl">
-                {copy[when].title}
+                {t.title}
               </h2>
-              <p className="mt-6 max-w-[46ch] text-lg leading-relaxed text-white/85">{copy[when].text}</p>
+              <p className="mt-6 max-w-[46ch] text-lg leading-relaxed text-white/85">{t.text}</p>
             </motion.div>
           </AnimatePresence>
 
           <div
             role="group"
-            aria-label="Momento della giornata"
-            className="mt-10 inline-flex border border-white/25"
+            aria-label="Tipologia di camera"
+            className="mt-10 inline-flex flex-wrap border border-white/25"
           >
-            {(
-              [
-                ["giorno", "Giorno", Sun],
-                ["sera", "Sera", Moon],
-              ] as const
-            ).map(([key, label, Icon]) => (
+            {TYPES.map((x, i) => (
               <button
-                key={key}
-                onClick={() => setWhen(key)}
-                aria-pressed={when === key}
+                key={x.key}
+                onClick={() => setSel(i)}
+                aria-pressed={sel === i}
                 className={`inline-flex min-h-[48px] items-center gap-2 px-6 text-xs font-semibold uppercase tracking-[0.3em] transition-colors duration-500 ${
-                  when === key ? "bg-white text-black" : "text-white hover:bg-white/10"
+                  sel === i ? "bg-white text-black" : "text-white hover:bg-white/10"
                 }`}
               >
-                <Icon size={18} strokeWidth={1.5} aria-hidden="true" />
-                {label}
+                <Users size={18} strokeWidth={1.5} aria-hidden="true" />
+                {x.name}
               </button>
             ))}
           </div>
 
-          <p className="mt-10 flex items-start gap-3 text-white/80">
-            <UtensilsCrossed size={20} strokeWidth={1.5} className="mt-1 shrink-0" aria-hidden="true" />
-            <span>
-              Per orari, menu e tavolo chiamaci allo{" "}
-              <a className="underline underline-offset-4 hover:text-white" href={HOTEL.phoneHref}>
-                {HOTEL.phone}
-              </a>
-              .
-            </span>
+          <ul className="mt-10 grid max-w-[46ch] grid-cols-2 gap-x-6 gap-y-3 text-white/85">
+            {[
+              { icon: ShowerHead, label: "Bagno con doccia" },
+              { icon: Snowflake, label: "Aria condizionata" },
+              { icon: Tv, label: "TV satellitare" },
+              { icon: Coffee, label: "Minibar" },
+            ].map((f) => (
+              <li key={f.label} className="flex items-center gap-2 text-sm">
+                <f.icon size={20} strokeWidth={1.5} aria-hidden="true" />
+                {f.label}
+              </li>
+            ))}
+          </ul>
+
+          <button
+            onClick={() => onRequest(t.name, t.guests)}
+            className={`${btnSolid} mt-10`}
+          >
+            Richiedi la {t.name.toLowerCase()}
+          </button>
+          <p className="mt-5 text-sm text-white/70">
+            Immagini rappresentative. Per disponibilità e tariffe chiamaci allo{" "}
+            <a className="underline underline-offset-4 hover:text-white" href={HOTEL.phoneHref}>
+              {HOTEL.phone}
+            </a>
+            .
           </p>
         </div>
 
@@ -1141,7 +1169,7 @@ function Restaurant() {
           <motion.div style={{ y: reduce ? 0 : y }} className="absolute -inset-y-[8%] inset-x-0">
             <AnimatePresence initial={false}>
               <motion.div
-                key={when}
+                key={t.key}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -1149,12 +1177,8 @@ function Restaurant() {
                 className="absolute inset-0"
               >
                 <Image
-                  src={when === "giorno" ? "/img/sala-giorno.jpg" : "/img/sala-sera.jpg"}
-                  alt={
-                    when === "giorno"
-                      ? "La sala del ristorante di giorno, immagine rappresentativa"
-                      : "La sala del ristorante di sera, immagine rappresentativa"
-                  }
+                  src={t.img}
+                  alt={`Camera ${t.name.toLowerCase()}, immagine rappresentativa`}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
@@ -1698,7 +1722,15 @@ export default function Home() {
               toContact({ message: `Vorrei informazioni su: ${room}.`, mode: "privato" })
             }
           />
-          <Restaurant />
+          <RoomTypes
+            onRequest={(name, guests) =>
+              toContact({
+                guests: String(guests),
+                message: `Vorrei informazioni sulla camera ${name.toLowerCase()}.`,
+                mode: "privato",
+              })
+            }
+          />
           <Services />
           <Business onRequest={() => toContact({ mode: "azienda" })} />
           <Contact prefill={prefill} />
