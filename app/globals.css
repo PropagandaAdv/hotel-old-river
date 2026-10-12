@@ -1,26 +1,71 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Design token: unica fonte di verita' per palette e font (scheda Brand Identity 22) */
+@theme {
+  --color-ink: #0b0a0a;
+  --color-ink-2: #161414;
+  --color-stone: #d3cece;
+  --color-mist: #f4f2f2;
+  --color-ink-soft: #4a4646;
+  --font-sans: var(--font-josefin), "Josefin Sans", system-ui, sans-serif;
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  overflow-x: hidden;
+  overflow-x: clip;
+  background: var(--color-ink);
+  color: #fff;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-stone);
+  outline-offset: 3px;
+}
+
+.on-light :focus-visible {
+  outline-color: #000;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* Scrim, ombra del testo e chip: leggibilita' sul video (scrub-pipeline, 4 livelli) */
+:root {
+  --tshadow: 0 1px 2px rgba(5, 5, 8, 0.95), 0 3px 12px rgba(5, 5, 8, 0.78), 0 10px 44px rgba(5, 5, 8, 0.8);
+}
+.tshadow {
+  text-shadow: var(--tshadow);
+}
+.tshadow-none {
+  text-shadow: none;
+}
+
+.show-short {
+  display: none;
+}
+@media (max-height: 560px) {
+  .hide-short {
+    display: none;
+  }
+  .show-short {
+    display: inline-flex;
+  }
 }
